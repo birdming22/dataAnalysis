@@ -17,8 +17,10 @@ def main():
             try:
                 data = dl.processMessage(ord(c))
                 if data is not None:
-                    if len(data) != 16:
+                    if len(data) == 8:
                         print 'data:', data
+                    else:
+                        print 'corrupt data:', data
             except:
                 pass
 

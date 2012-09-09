@@ -12,6 +12,13 @@ class Datalink:
     -----------------------------------------------
     | 255 | SeqNum | Data1 | Data2 | ... | Data16 |
     -----------------------------------------------
+
+    Sensor Data is 10 bits and packed into two bytes.
+    ------------------------------------------------
+    | Byte | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+    ------------------------------------------------
+    |      |     Data1         |     Data2         |
+    ------------------------------------------------
     """
     def __init__(self):
         self.state = STATE.SYNC
@@ -19,6 +26,22 @@ class Datalink:
         self.data = []
         self.seqNum = None
         self.result = None
+
+    def _unpack(self):
+        dataLen = len(self.result)
+        if dataLen % 2 != 0:
+            print 'reuslt:', self.result
+            self.result = self.result[:dataLen - 1]
+            print 'reuslt:', self.result
+        dataList = []
+        for i in range(dataLen):
+            if i % 2 == 0:
+                print i
+                # for hoya's pcb
+                #dataList.append(1023 - self.result[i+1] * 32 - self.result[i])
+                # for whyang's pcb
+                dataList.append(self.result[i+1] * 32 + self.result[i])
+        return dataList
 
     def processMessage(self, ch):
         if self.state == STATE.SYNC:
@@ -51,7 +74,7 @@ class Datalink:
                 self.dataCount = 0
                 self.data = []
                 self.state = STATE.SYNC
-                return self.result
+                return self._unpack()
             self.dataCount += 1
             if self.dataCount == DATA.FRAME_SIZE:
                 self.data.append(ch)
@@ -59,6 +82,6 @@ class Datalink:
                 self.dataCount = 0
                 self.data = []
                 self.state = STATE.SYNC
-                return self.result
+                return self._unpack()
             else:
                 self.data.append(ch)
