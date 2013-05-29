@@ -4,7 +4,27 @@
 import datalink
 
 import sys
-import scipy
+try:
+    import scipy
+except:
+    print """ 
+Install instruction for ubuntu
+
+sudo apt-get install python-pip python-dev build-essential
+sudo pip install --upgrade pip 
+sudo pip install --upgrade virtualenv
+
+sudo apt-get install python-numpy python-scipy python-matplotlib
+
+or
+
+sudo pip install numpy
+sudo apt-get install libatlas-base-dev gfortran
+sudo pip install scipy
+sudo pip install matplotlib
+"""
+    raise
+
 import scipy.fftpack
 import pylab
 from scipy import pi
@@ -49,7 +69,7 @@ def main():
             except:
                 pass
 
-    t = scipy.linspace(0, 100, len(dataList))
+    t = scipy.linspace(0, (len(dataList)-1)/128, len(dataList))
 
     FFT = abs(scipy.fft(dataList))
     freqs = scipy.fftpack.fftfreq(len(dataList), t[1]-t[0])
@@ -57,7 +77,7 @@ def main():
     pylab.subplot(211)
     pylab.plot(t, dataList)
     pylab.subplot(212)
-    pylab.plot(freqs,20*scipy.log10(FFT),'x')
+    pylab.plot(freqs,100*scipy.log10(FFT),'x')
 
     pylab.show()
 
